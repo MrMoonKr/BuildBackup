@@ -1,3 +1,7 @@
+# Fork Note
+- Added Rabbit.Net source code for One Click Build
+- For c# newbie
+
 **Note**: This application is no longer actively supported. While parts of it might still work, I don't actively make an effort to make sure it _keeps_ working.
 
 # BuildBackup

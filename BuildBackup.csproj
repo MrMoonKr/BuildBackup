@@ -22,12 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Ribbit.NET">
-      <HintPath>..\..\..\GitHub\Ribbit.NET\Ribbit.NET\bin\Debug\netcoreapp2.1\Ribbit.NET.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="config.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
