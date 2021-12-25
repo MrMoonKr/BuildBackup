@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
+
 namespace BuildBackup
 {
     // Implementation of Bob Jenkins' hash function in C# (96 bit internal state)

@@ -6,188 +6,188 @@ namespace BuildBackup
 {
     public struct VersionsFile
     {
-        public VersionsEntry[] entries;
+        public VersionsEntry[]  entries;
     }
 
     public struct VersionsEntry
     {
-        public string region;
-        public string buildConfig;
-        public string cdnConfig;
-        public string buildId;
-        public string versionsName;
-        public string productConfig;
-        public string keyRing;
+        public string           region;
+        public string           buildConfig;
+        public string           cdnConfig;
+        public string           buildId;
+        public string           versionsName;
+        public string           productConfig;
+        public string           keyRing;
     }
 
     public struct CdnsFile
     {
-        public CdnsEntry[] entries;
+        public CdnsEntry[]      entries;
     }
 
     public struct CdnsEntry
     {
-        public string name;
-        public string path;
-        public string[] hosts;
-        public string configPath;
+        public string           name;
+        public string           path;
+        public string[]         hosts;
+        public string           configPath;
     }
 
     public struct GameBlobFile
     {
-        public string decryptionKeyName;
+        public string           decryptionKeyName;
     }
 
     public struct BuildConfigFile
     {
-        public string root;
-        public string[] download;
-        public string[] downloadSize;
-        public string[] install;
-        public string[] installSize;
-        public string[] encoding;
-        public string[] encodingSize;
-        public string[] size;
-        public string[] sizeSize;
-        public string buildName;
-        public string buildPlaybuildInstaller;
-        public string buildProduct;
-        public string buildUid;
-        public string buildBranch;
-        public string buildNumber;
-        public string buildAttributes;
-        public string buildComments;
-        public string buildCreator;
-        public string buildFixedHash;
-        public string buildReplayHash;
-        public string buildManifestVersion;
-        public string buildSignatureFile;
-        public string patch;
-        public string patchSize;
-        public string patchConfig;
-        public string partialPriority;
-        public string partialPrioritySize;
+        public string           root;
+        public string[]         download;
+        public string[]         downloadSize;
+        public string[]         install;
+        public string[]         installSize;
+        public string[]         encoding;
+        public string[]         encodingSize;
+        public string[]         size;
+        public string[]         sizeSize;
+        public string           buildName;
+        public string           buildPlaybuildInstaller;
+        public string           buildProduct;
+        public string           buildUid;
+        public string           buildBranch;
+        public string           buildNumber;
+        public string           buildAttributes;
+        public string           buildComments;
+        public string           buildCreator;
+        public string           buildFixedHash;
+        public string           buildReplayHash;
+        public string           buildManifestVersion;
+        public string           buildSignatureFile;
+        public string           patch;
+        public string           patchSize;
+        public string           patchConfig;
+        public string           partialPriority;
+        public string           partialPrioritySize;
     }
 
     public struct CDNConfigFile
     {
-        public string[] archives;
-        public string archiveGroup;
-        public string[] patchArchives;
-        public string patchArchiveGroup;
-        public string[] builds;
-        public string fileIndex;
-        public string fileIndexSize;
-        public string patchFileIndex;
-        public string patchFileIndexSize;
+        public string[]         archives;
+        public string           archiveGroup;
+        public string[]         patchArchives;
+        public string           patchArchiveGroup;
+        public string[]         builds;
+        public string           fileIndex;
+        public string           fileIndexSize;
+        public string           patchFileIndex;
+        public string           patchFileIndexSize;
     }
 
     public struct IndexEntry
     {
-        public short index;
-        public uint offset;
-        public uint size;
+        public short            index;
+        public uint             offset;
+        public uint             size;
     }
 
     public struct IndexFooter
     {
-        public byte[] tocHash;
-        public byte version;
-        public byte unk0;
-        public byte unk1;
-        public byte blockSizeKB;
-        public byte offsetBytes;
-        public byte sizeBytes;
-        public byte keySizeInBytes;
-        public byte checksumSize;
-        public uint numElements;
-        public byte[] footerChecksum;
+        public byte[]           tocHash;
+        public byte             version;
+        public byte             unk0;
+        public byte             unk1;
+        public byte             blockSizeKB;
+        public byte             offsetBytes;
+        public byte             sizeBytes;
+        public byte             keySizeInBytes;
+        public byte             checksumSize;
+        public uint             numElements;
+        public byte[]           footerChecksum;
     }
 
     public struct EncodingFile
     {
-        public byte unk1;
-        public byte checksumSizeA;
-        public byte checksumSizeB;
-        public ushort sizeA;
-        public ushort sizeB;
-        public uint numEntriesA;
-        public uint numEntriesB;
-        public byte unk2;
-        public ulong stringBlockSize;
-        public string[] stringBlockEntries;
+        public byte             unk1;
+        public byte             checksumSizeA;
+        public byte             checksumSizeB;
+        public ushort           sizeA;
+        public ushort           sizeB;
+        public uint             numEntriesA;
+        public uint             numEntriesB;
+        public byte             unk2;
+        public ulong            stringBlockSize;
+        public string[]         stringBlockEntries;
         public EncodingHeaderEntry[] aHeaders;
         public EncodingFileEntry[] aEntries;
         public EncodingHeaderEntry[] bHeaders;
         public Dictionary<string, EncodingFileDescEntry> bEntries;
-        public string encodingESpec;
+        public string           encodingESpec;
     }
 
     public struct EncodingHeaderEntry
     {
-        public string firstHash;
-        public string checksum;
+        public string           firstHash;
+        public string           checksum;
     }
 
     public struct EncodingFileEntry
     {
-        public ushort keyCount;
-        public uint size;
-        public string cKey;
-        public List<string> eKeys;
+        public ushort           keyCount;
+        public uint             size;
+        public string           cKey;
+        public List<string>     eKeys;
     }
 
     public struct EncodingFileDescEntry
     {
-        public string key;
-        public uint stringIndex;
-        public ulong compressedSize;
+        public string           key;
+        public uint             stringIndex;
+        public ulong            compressedSize;
     }
 
     public struct InstallFile
     {
-        public byte hashSize;
-        public ushort numTags;
-        public uint numEntries;
+        public byte             hashSize;
+        public ushort           numTags;
+        public uint             numEntries;
         public InstallTagEntry[] tags;
         public InstallFileEntry[] entries;
     }
 
     public struct InstallTagEntry
     {
-        public string name;
-        public ushort type;
-        public BitArray files;
+        public string           name;
+        public ushort           type;
+        public BitArray         files;
     }
 
     public struct InstallFileEntry
     {
-        public string name;
-        public byte[] contentHash;
-        public uint size;
-        public List<string> tags;
+        public string           name;
+        public byte[]           contentHash;
+        public uint             size;
+        public List<string>     tags;
     }
 
     public struct DownloadFile
     {
-        public byte[] unk;
-        public uint numEntries;
-        public uint numTags;
-        public DownloadEntry[] entries;
+        public byte[]           unk;
+        public uint             numEntries;
+        public uint             numTags;
+        public DownloadEntry[]  entries;
     }
 
     public struct DownloadEntry
     {
-        public string hash;
-        public byte[] unk;
+        public string           hash;
+        public byte[]           unk;
     }
 
     public struct BLTEChunkInfo
     {
-        public bool isFullChunk;
-        public int compSize;
-        public int decompSize;
-        public byte[] checkSum;
+        public bool             isFullChunk;
+        public int              compSize;
+        public int              decompSize;
+        public byte[]           checkSum;
     }
 
     public struct RootFile
@@ -198,54 +198,54 @@ namespace BuildBackup
 
     public struct RootEntry
     {
-        public ContentFlags contentFlags;
-        public LocaleFlags localeFlags;
-        public ulong lookup;
-        public uint fileDataID;
-        public byte[] md5;
+        public ContentFlags     contentFlags;
+        public LocaleFlags      localeFlags;
+        public ulong            lookup;
+        public uint             fileDataID;
+        public byte[]           md5;
     }
 
     public struct PatchFile
     {
-        public byte version;
-        public byte fileKeySize;
-        public byte sizeB;
-        public byte patchKeySize;
-        public byte blockSizeBits;
-        public ushort blockCount;
-        public byte flags;
-        public byte[] encodingContentKey;
-        public byte[] encodingEncodingKey;
-        public uint decodedSize;
-        public uint encodedSize;
-        public byte especLength;
-        public string encodingSpec;
-        public PatchBlock[] blocks;
+        public byte             version;
+        public byte             fileKeySize;
+        public byte             sizeB;
+        public byte             patchKeySize;
+        public byte             blockSizeBits;
+        public ushort           blockCount;
+        public byte             flags;
+        public byte[]           encodingContentKey;
+        public byte[]           encodingEncodingKey;
+        public uint             decodedSize;
+        public uint             encodedSize;
+        public byte             especLength;
+        public string           encodingSpec;
+        public PatchBlock[]     blocks;
     }
 
     public struct PatchBlock
     {
-        public byte[] lastFileContentKey;
-        public byte[] blockMD5;
-        public uint blockOffset;
-        public BlockFile[] files;
+        public byte[]           lastFileContentKey;
+        public byte[]           blockMD5;
+        public uint             blockOffset;
+        public BlockFile[]      files;
     }
 
     public struct BlockFile
     {
-        public byte numPatches;
-        public byte[] targetFileContentKey;
-        public ulong decodedSize;
-        public FilePatch[] patches;
+        public byte             numPatches;
+        public byte[]           targetFileContentKey;
+        public ulong            decodedSize;
+        public FilePatch[]      patches;
     }
 
     public struct FilePatch
     {
-        public byte[] sourceFileEncodingKey;
-        public ulong decodedSize;
-        public byte[] patchEncodingKey;
-        public uint patchSize;
-        public byte patchIndex;
+        public byte[]           sourceFileEncodingKey;
+        public ulong            decodedSize;
+        public byte[]           patchEncodingKey;
+        public uint             patchSize;
+        public byte             patchIndex;
     }
 
     [Flags]

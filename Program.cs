@@ -12,28 +12,28 @@ namespace BuildBackup
 {
     class Program
     {
-        private static readonly Uri baseUrl = new Uri("http://us.patch.battle.net:1119/");
+        private static readonly Uri     baseUrl = new Uri("http://us.patch.battle.net:1119/"); // 기본 Patch CDN
 
-        private static string[] checkPrograms;
-        private static string[] backupPrograms;
+        private static string[]         checkPrograms;
+        private static string[]         backupPrograms;
 
-        private static VersionsFile versions;
-        private static CdnsFile cdns;
-        private static GameBlobFile productConfig;
-        private static BuildConfigFile buildConfig;
+        private static VersionsFile     versions;
+        private static CdnsFile         cdns;
+        private static GameBlobFile     productConfig;
+        private static BuildConfigFile  buildConfig;
         private static BuildConfigFile[] cdnBuildConfigs;
-        private static CDNConfigFile cdnConfig;
-        private static EncodingFile encoding;
-        private static InstallFile install;
-        private static DownloadFile download;
-        private static RootFile root;
-        private static PatchFile patch;
+        private static CDNConfigFile    cdnConfig;
+        private static EncodingFile     encoding;
+        private static InstallFile      install;
+        private static DownloadFile     download;
+        private static RootFile         root;
+        private static PatchFile        patch;
 
-        private static bool fullDownload = true;
+        private static bool             fullDownload = true;
 
-        private static bool overrideVersions;
-        private static string overrideBuildconfig;
-        private static string overrideCDNconfig;
+        private static bool             overrideVersions;
+        private static string           overrideBuildconfig;
+        private static string           overrideCDNconfig;
 
         private static Dictionary<string, IndexEntry> indexDictionary = new Dictionary<string, IndexEntry>();
         private static Dictionary<string, IndexEntry> patchIndexDictionary = new Dictionary<string, IndexEntry>();
@@ -41,19 +41,20 @@ namespace BuildBackup
         private static Dictionary<string, IndexEntry> patchFileIndexList = new Dictionary<string, IndexEntry>();
         private static ReaderWriterLockSlim cacheLock = new ReaderWriterLockSlim();
 
-        private static CDN cdn = new CDN();
+        private static CDN              cdn = new CDN();
 
-        static async Task Main(string[] args)
+        static async Task Main( string[] args )
         {
-            cdn.cacheDir = SettingsManager.cacheDir;
-            cdn.client = new HttpClient();
-            cdn.client.Timeout = new TimeSpan(0, 5, 0);
-            cdn.cdnList = new List<string> {
-                "blzddist1-a.akamaihd.net", // Akamai first
+            cdn.cacheDir                = SettingsManager.cacheDir;
+            cdn.client                  = new HttpClient();
+            cdn.client.Timeout          = new TimeSpan(0, 5, 0);
+            cdn.cdnList                 = new List<string> {
+                "kr.cdn.blizzard.com", // Korea
+                //"blzddist1-a.akamaihd.net", // Akamai first
                 //"level3.blizzard.com",      // Level3
                 //"us.cdn.blizzard.com",      // Official US CDN
                 //"eu.cdn.blizzard.com",      // Official EU CDN
-                "cdn.blizzard.com",         // Official regionless CDN
+                //"cdn.blizzard.com",         // Official regionless CDN
                 //"client01.pdl.wow.battlenet.com.cn", // China 1
                 //"client02.pdl.wow.battlenet.com.cn", // China 2
                 //"client03.pdl.wow.battlenet.com.cn", // China 3
@@ -63,9 +64,12 @@ namespace BuildBackup
             };
 
             // Check if cache/backup directory exists
-            if (!Directory.Exists(cdn.cacheDir)) { Directory.CreateDirectory(cdn.cacheDir); }
+            if ( !Directory.Exists( cdn.cacheDir ) ) 
+            { 
+                Directory.CreateDirectory( cdn.cacheDir ); 
+            }
 
-            if (args.Length > 0)
+            if ( args.Length > 0 )
             {
                 if (args[0] == "dumpinfo")
                 {
@@ -822,61 +826,69 @@ namespace BuildBackup
             }
 
             // Load programs
-            if (checkPrograms == null)
+            if ( checkPrograms == null )
             {
                 checkPrograms = SettingsManager.checkProducts;
             }
 
             backupPrograms = SettingsManager.backupProducts;
 
-            var finishedCDNConfigs = new List<string>();
-            var finishedEncodings = new List<string>();
+            var finishedCDNConfigs  = new List<string>();
+            var finishedEncodings   = new List<string>();
 
-            var downloadThrottler = new SemaphoreSlim(initialCount: 10);
+            var downloadThrottler   = new SemaphoreSlim( initialCount: 10 );
 
-            foreach (string program in checkPrograms)
+            foreach ( string program in checkPrograms )
             {
                 var archiveSizes = new Dictionary<string, uint>();
 
-                if (File.Exists("archiveSizes.txt"))
+                if ( File.Exists( "archiveSizes.txt" ) )
                 {
-                    foreach (var line in File.ReadAllLines("archiveSizes.txt"))
+                    foreach ( var line in File.ReadAllLines("archiveSizes.txt"))
                     {
                         var split = line.Split(' ');
-                        if (uint.TryParse(split[1], out uint archiveSize))
+                        if ( uint.TryParse( split[1], out uint archiveSize ) )
                         {
-                            archiveSizes.Add(split[0], archiveSize);
+                            archiveSizes.Add( split[0], archiveSize );
                         }
                     }
                 }
 
-                Console.WriteLine("Using program " + program);
+                Console.WriteLine( "Using program " + program );
 
                 try
                 {
-                    versions = GetVersions(program);
+                    versions = GetVersions( program );
                 }
-                catch (Exception e)
+                catch ( Exception e )
                 {
                     Console.WriteLine("Error parsing versions: " + e.Message);
                 }
 
-                if (versions.entries == null || versions.entries.Count() == 0) { Console.WriteLine("Invalid versions file for " + program + ", skipping!"); continue; }
-                Console.WriteLine("Loaded " + versions.entries.Count() + " versions");
+                if ( versions.entries == null || versions.entries.Count() == 0 ) 
+                { 
+                    Console.WriteLine("Invalid versions file for " + program + ", skipping!"); 
+                    continue; 
+                }
+                Console.WriteLine( "Loaded " + versions.entries.Count() + " versions" );
 
                 try
                 {
-                    cdns = GetCDNs(program);
+                    cdns = GetCDNs( program );
                 }
-                catch (Exception e)
+                catch ( Exception e )
                 {
                     Console.WriteLine("Error parsing CDNs: " + e.Message);
                 }
 
-                if (cdns.entries == null || cdns.entries.Count() == 0) { Console.WriteLine("Invalid CDNs file for " + program + ", skipping!"); continue; }
+                if ( cdns.entries == null || cdns.entries.Count() == 0 ) 
+                { 
+                    Console.WriteLine("Invalid CDNs file for " + program + ", skipping!"); 
+                    continue; 
+                }
                 Console.WriteLine("Loaded " + cdns.entries.Count() + " cdns");
 
-                if (!string.IsNullOrEmpty(versions.entries[0].productConfig))
+                if ( !string.IsNullOrEmpty( versions.entries[0].productConfig ) )
                 {
                     productConfig = GetProductConfig(cdns.entries[0].configPath + "/", versions.entries[0].productConfig);
                 }
@@ -1367,28 +1379,32 @@ namespace BuildBackup
             return new byte[0];
         }
 
-        private static CDNConfigFile GetCDNconfig(string url, string hash)
+        private static CDNConfigFile GetCDNconfig( string url, string hash )
         {
             string content;
             var cdnConfig = new CDNConfigFile();
 
             try
             {
-                content = Encoding.UTF8.GetString(cdn.Get(url + "/config/" + hash[0] + hash[1] + "/" + hash[2] + hash[3] + "/" + hash).Result);
+                content = Encoding.UTF8.GetString( cdn.Get( url + "/config/" + hash[0] + hash[1] + "/" + hash[2] + hash[3] + "/" + hash).Result );
             }
-            catch (Exception e)
+            catch ( Exception e )
             {
-                Console.WriteLine("Error retrieving CDN config: " + e.Message);
+                Console.WriteLine( "Error retrieving CDN config: " + e.Message );
                 return cdnConfig;
             }
 
-            var cdnConfigLines = content.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            var cdnConfigLines = content.Split( new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries );
 
-            for (var i = 0; i < cdnConfigLines.Count(); i++)
+            for ( var i = 0 ; i < cdnConfigLines.Count() ; i++ )
             {
-                if (cdnConfigLines[i].StartsWith("#") || cdnConfigLines[i].Length == 0) { continue; }
-                var cols = cdnConfigLines[i].Split(new string[] { " = " }, StringSplitOptions.RemoveEmptyEntries);
-                switch (cols[0])
+                if ( cdnConfigLines[i].StartsWith("#") || cdnConfigLines[i].Length == 0 ) // 주석 체크
+                {
+                    continue;
+                }
+
+                var cols = cdnConfigLines[i].Split( new string[] { " = " }, StringSplitOptions.RemoveEmptyEntries );
+                switch ( cols[0] )
                 {
                     case "archives":
                         var archives = cols[1].Split(' ');
@@ -1424,7 +1440,9 @@ namespace BuildBackup
                         cdnConfig.patchFileIndexSize = cols[1];
                         break;
                     default:
-                        //Console.WriteLine("!!!!!!!! Unknown cdnconfig variable '" + cols[0] + "'");
+                        {
+                            Console.WriteLine( "!!!!!!!! Unknown cdnconfig variable '" + cols[0] + "'" );
+                        }
                         break;
                 }
             }
@@ -1432,14 +1450,14 @@ namespace BuildBackup
             return cdnConfig;
         }
 
-        private static VersionsFile GetVersions(string program)
+        private static VersionsFile GetVersions( string program )
         {
             string content;
             var versions = new VersionsFile();
 
-            if (!SettingsManager.useRibbit)
+            if ( !SettingsManager.useRibbit )
             {
-                using (HttpResponseMessage response = cdn.client.GetAsync(new Uri(baseUrl + program + "/" + "versions")).Result)
+                using ( HttpResponseMessage response = cdn.client.GetAsync( new Uri( baseUrl + program + "/" + "versions")).Result)
                 {
                     if (response.IsSuccessStatusCode)
                     {
@@ -1493,32 +1511,31 @@ namespace BuildBackup
                 }
             }
 
-            content = content.Replace("\0", "");
-            var lines = content.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            content     = content.Replace("\0", "");
+            var lines   = content.Split( new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries );
 
             var lineList = new List<string>();
-
-            for (var i = 0; i < lines.Count(); i++)
+            for ( var i = 0 ; i < lines.Count() ; i++ )
             {
-                if (lines[i][0] != '#')
+                if ( lines[i][0] != '#' ) // 주석체크
                 {
-                    lineList.Add(lines[i]);
+                    lineList.Add( lines[i] );
                 }
             }
 
             lines = lineList.ToArray();
 
-            if (lines.Count() > 0)
+            if ( lines.Count() > 0 )
             {
-                versions.entries = new VersionsEntry[lines.Count() - 1];
+                versions.entries = new VersionsEntry[ lines.Count() - 1 ];
 
                 var cols = lines[0].Split('|');
 
-                for (var c = 0; c < cols.Count(); c++)
+                for ( var c = 0 ; c < cols.Count() ; c++ )
                 {
-                    var friendlyName = cols[c].Split('!').ElementAt(0);
+                    var friendlyName = cols[c].Split('!').ElementAt( 0 );
 
-                    for (var i = 1; i < lines.Count(); i++)
+                    for ( var i = 1 ; i < lines.Count() ; i++ )
                     {
                         var row = lines[i].Split('|');
 
@@ -1558,33 +1575,32 @@ namespace BuildBackup
             return versions;
         }
 
-        private static CdnsFile GetCDNs(string program)
+        private static CdnsFile GetCDNs( string program )
         {
             string content;
 
             var cdns = new CdnsFile();
 
-            if (!SettingsManager.useRibbit)
+            if ( !SettingsManager.useRibbit )
             {
-                using (HttpResponseMessage response = cdn.client.GetAsync(new Uri(baseUrl + program + "/" + "cdns")).Result)
+                using ( HttpResponseMessage response = cdn.client.GetAsync( new Uri( baseUrl + program + "/" + "cdns" ) ).Result )
                 {
-                    if (response.IsSuccessStatusCode)
+                    if ( response.IsSuccessStatusCode )
                     {
-                        using (HttpContent res = response.Content)
+                        using ( HttpContent res = response.Content )
                         {
                             content = res.ReadAsStringAsync().Result;
                         }
                     }
                     else
                     {
-                        Console.WriteLine("Error during retrieving HTTP cdns: Received bad HTTP code " + response.StatusCode);
+                        Console.WriteLine( "Error during retrieving HTTP cdns: Received bad HTTP code " + response.StatusCode );
                         return cdns;
                     }
                 }
             }
             else
             {
-
                 try
                 {
                     var client = new Ribbit.Protocol.Client(Ribbit.Constants.Region.US);
@@ -1620,35 +1636,33 @@ namespace BuildBackup
                 }
             }
 
-            var lines = content.Split(new string[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
+            var lines = content.Split( new string[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries );
 
             var lineList = new List<string>();
-
-            for (var i = 0; i < lines.Count(); i++)
+            for ( var i = 0 ; i < lines.Count() ; i++ )
             {
-                if (lines[i][0] != '#')
+                if ( lines[i][0] != '#' )
                 {
-                    lineList.Add(lines[i]);
+                    lineList.Add( lines[i] );
                 }
             }
 
             lines = lineList.ToArray();
-
-            if (lines.Count() > 0)
+            if ( lines.Count() > 0 )
             {
-                cdns.entries = new CdnsEntry[lines.Count() - 1];
+                cdns.entries = new CdnsEntry[ lines.Count() - 1 ];
 
                 var cols = lines[0].Split('|');
 
-                for (var c = 0; c < cols.Count(); c++)
+                for ( var c = 0 ; c < cols.Count() ; c++ )
                 {
-                    var friendlyName = cols[c].Split('!').ElementAt(0);
+                    var friendlyName = cols[c].Split('!').ElementAt( 0 ) ;
 
-                    for (var i = 1; i < lines.Count(); i++)
+                    for ( var i = 1 ; i < lines.Count() ; i++ )
                     {
-                        var row = lines[i].Split('|');
+                        var row = lines[i].Split( '|' );
 
-                        switch (friendlyName)
+                        switch ( friendlyName )
                         {
                             case "Name":
                                 cdns.entries[i - 1].name = row[c];
@@ -1674,13 +1688,13 @@ namespace BuildBackup
                     }
                 }
 
-                foreach (var subcdn in cdns.entries)
+                foreach ( var subcdn in cdns.entries )
                 {
-                    foreach (var cdnHost in subcdn.hosts)
+                    foreach ( var cdnHost in subcdn.hosts )
                     {
-                        if (!cdn.cdnList.Contains(cdnHost))
+                        if ( !cdn.cdnList.Contains( cdnHost ) )
                         {
-                            cdn.cdnList.Add(cdnHost);
+                            cdn.cdnList.Add( cdnHost );
                         }
                     }
                 }
