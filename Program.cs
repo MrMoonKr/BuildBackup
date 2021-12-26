@@ -12,7 +12,8 @@ namespace BuildBackup
 {
     class Program
     {
-        private static readonly Uri     baseUrl = new Uri("http://us.patch.battle.net:1119/"); // 기본 Patch CDN
+        //private static readonly Uri     baseUrl = new Uri("http://us.patch.battle.net:1119/"); // 기본 Patch CDN
+        private static Uri              baseUrl = new Uri("http://kr.patch.battle.net:1119/"); // 기본 Patch CDN
 
         private static string[]         checkPrograms;
         private static string[]         backupPrograms;
@@ -45,6 +46,8 @@ namespace BuildBackup
 
         static async Task Main( string[] args )
         {
+            baseUrl                     = new Uri( "http://kr.patch.battle.net:1119/" ); // Korea Patch Server
+
             cdn.cacheDir                = SettingsManager.cacheDir;
             cdn.client                  = new HttpClient();
             cdn.client.Timeout          = new TimeSpan(0, 5, 0);
@@ -890,7 +893,7 @@ namespace BuildBackup
 
                 if ( !string.IsNullOrEmpty( versions.entries[0].productConfig ) )
                 {
-                    productConfig = GetProductConfig(cdns.entries[0].configPath + "/", versions.entries[0].productConfig);
+                    productConfig = GetProductConfig( cdns.entries[0].configPath + "/", versions.entries[0].productConfig );
                 }
 
                 var decryptionKeyName = "";
@@ -1457,11 +1460,11 @@ namespace BuildBackup
 
             if ( !SettingsManager.useRibbit )
             {
-                using ( HttpResponseMessage response = cdn.client.GetAsync( new Uri( baseUrl + program + "/" + "versions")).Result)
+                using ( HttpResponseMessage response = cdn.client.GetAsync( new Uri( baseUrl + program + "/" + "versions") ).Result )
                 {
-                    if (response.IsSuccessStatusCode)
+                    if ( response.IsSuccessStatusCode )
                     {
-                        using (HttpContent res = response.Content)
+                        using ( HttpContent res = response.Content )
                         {
                             content = res.ReadAsStringAsync().Result;
                         }
@@ -1511,10 +1514,9 @@ namespace BuildBackup
                 }
             }
 
-            content     = content.Replace("\0", "");
-            var lines   = content.Split( new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries );
-
-            var lineList = new List<string>();
+            content         = content.Replace( "\0", "" );
+            var lines       = content.Split( new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries );
+            var lineList    = new List<string>();
             for ( var i = 0 ; i < lines.Count() ; i++ )
             {
                 if ( lines[i][0] != '#' ) // 주석체크
@@ -1523,23 +1525,23 @@ namespace BuildBackup
                 }
             }
 
-            lines = lineList.ToArray();
+            lines           = lineList.ToArray();
 
             if ( lines.Count() > 0 )
             {
                 versions.entries = new VersionsEntry[ lines.Count() - 1 ];
 
-                var cols = lines[0].Split('|');
+                var cols = lines[0].Split('|'); // 칼럼항목들
 
                 for ( var c = 0 ; c < cols.Count() ; c++ )
                 {
-                    var friendlyName = cols[c].Split('!').ElementAt( 0 );
+                    var friendlyName = cols[c].Split('!').ElementAt( 0 ); // 칼럼이름
 
                     for ( var i = 1 ; i < lines.Count() ; i++ )
                     {
                         var row = lines[i].Split('|');
 
-                        switch (friendlyName)
+                        switch ( friendlyName )
                         {
                             case "Region":
                                 versions.entries[i - 1].region = row[c];
@@ -1636,9 +1638,8 @@ namespace BuildBackup
                 }
             }
 
-            var lines = content.Split( new string[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries );
-
-            var lineList = new List<string>();
+            var lines       = content.Split( new string[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries );
+            var lineList    = new List<string>();
             for ( var i = 0 ; i < lines.Count() ; i++ )
             {
                 if ( lines[i][0] != '#' )
@@ -1648,15 +1649,16 @@ namespace BuildBackup
             }
 
             lines = lineList.ToArray();
+
             if ( lines.Count() > 0 )
             {
                 cdns.entries = new CdnsEntry[ lines.Count() - 1 ];
 
-                var cols = lines[0].Split('|');
+                var cols = lines[0].Split('|'); // 칼럼항목
 
                 for ( var c = 0 ; c < cols.Count() ; c++ )
                 {
-                    var friendlyName = cols[c].Split('!').ElementAt( 0 ) ;
+                    var friendlyName = cols[c].Split('!').ElementAt( 0 ) ; // 칼럼이름
 
                     for ( var i = 1 ; i < lines.Count() ; i++ )
                     {
@@ -1672,14 +1674,14 @@ namespace BuildBackup
                                 break;
                             case "Hosts":
                                 var hosts = row[c].Split(' ');
-                                cdns.entries[i - 1].hosts = new string[hosts.Count()];
-                                for (var h = 0; h < hosts.Count(); h++)
+                                cdns.entries[i - 1].hosts = new string[ hosts.Count() ];
+                                for ( var h = 0; h < hosts.Count(); h++ )
                                 {
-                                    cdns.entries[i - 1].hosts[h] = hosts[h];
+                                    cdns.entries[ i - 1 ].hosts[h] = hosts[h];
                                 }
                                 break;
                             case "ConfigPath":
-                                cdns.entries[i - 1].configPath = row[c];
+                                cdns.entries[ i - 1 ].configPath = row[ c ];
                                 break;
                             default:
                                 //Console.WriteLine("!!!!!!!! Unknown cdns variable '" + friendlyName + "'");
@@ -1703,7 +1705,7 @@ namespace BuildBackup
             return cdns;
         }
 
-        private static GameBlobFile GetProductConfig(string url, string hash)
+        private static GameBlobFile GetProductConfig( string url, string hash )
         {
             string content;
 
@@ -1711,7 +1713,7 @@ namespace BuildBackup
 
             try
             {
-                content = Encoding.UTF8.GetString(cdn.Get(url + hash[0] + hash[1] + "/" + hash[2] + hash[3] + "/" + hash).Result);
+                content = Encoding.UTF8.GetString( cdn.Get( url + hash[0] + hash[1] + "/" + hash[2] + hash[3] + "/" + hash ).Result );
             }
             catch (Exception e)
             {
@@ -1725,15 +1727,23 @@ namespace BuildBackup
                 return gblob;
             }
 
-            dynamic json = Newtonsoft.Json.JsonConvert.DeserializeObject(content);
-            if (json.all.config.decryption_key_name != null)
+            dynamic json = Newtonsoft.Json.JsonConvert.DeserializeObject( content );
+            if ( json.all.config.decryption_key_name != null )
             {
                 gblob.decryptionKeyName = json.all.config.decryption_key_name.Value;
             }
+
             return gblob;
         }
 
-        private static BuildConfigFile GetBuildConfig(string url, string hash)
+        /// <summary>
+        /// Build Configuration 파일 로딩
+        /// cdn/tpr/wow/config/hashPath
+        /// </summary>
+        /// <param name="url">/tpr/wow/</param>
+        /// <param name="hash">HEX:16</param>
+        /// <returns></returns>
+        private static BuildConfigFile GetBuildConfig( string url, string hash )
         {
             string content;
 
@@ -1741,115 +1751,115 @@ namespace BuildBackup
 
             try
             {
-                content = Encoding.UTF8.GetString(cdn.Get(url + "/config/" + hash[0] + hash[1] + "/" + hash[2] + hash[3] + "/" + hash).Result);
+                content = Encoding.UTF8.GetString( cdn.Get( url + "/config/" + hash[0] + hash[1] + "/" + hash[2] + hash[3] + "/" + hash ).Result );
             }
-            catch (Exception e)
+            catch ( Exception e )
             {
-                Console.WriteLine("Error retrieving build config: " + e.Message);
+                Console.WriteLine( "Error retrieving build config: " + e.Message );
                 return buildConfig;
             }
 
-            if (string.IsNullOrEmpty(content) || !content.StartsWith("# Build"))
+            if ( string.IsNullOrEmpty( content ) || !content.StartsWith( "# Build" ) )
             {
-                Console.WriteLine("Error reading build config!");
+                Console.WriteLine( "Error reading build config!" );
                 return buildConfig;
             }
 
-            var lines = content.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
-
-            for (var i = 0; i < lines.Count(); i++)
+            var lines = content.Split( new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries );
+            for ( var i = 0 ; i < lines.Count() ; i++ )
             {
-                if (lines[i].StartsWith("#") || lines[i].Length == 0) { continue; }
-                var cols = lines[i].Split(new string[] { " = " }, StringSplitOptions.RemoveEmptyEntries);
-                switch (cols[0])
+                if ( lines[ i ].StartsWith( "#" ) || lines[ i ].Length == 0 ) { continue; } // 주석 및 공란 스킵
+
+                var cols = lines[i].Split( new string[] { " = " }, StringSplitOptions.RemoveEmptyEntries );
+                switch ( cols[ 0 ] )
                 {
                     case "root":
-                        buildConfig.root = cols[1];
+                        buildConfig.root = cols[ 1 ];
                         break;
                     case "download":
-                        buildConfig.download = cols[1].Split(' ');
+                        buildConfig.download = cols[ 1 ].Split( ' ' );
                         break;
                     case "install":
-                        buildConfig.install = cols[1].Split(' ');
+                        buildConfig.install = cols[ 1 ].Split( ' ' );
                         break;
                     case "encoding":
-                        buildConfig.encoding = cols[1].Split(' ');
+                        buildConfig.encoding = cols[ 1 ].Split( ' ' );
                         break;
                     case "encoding-size":
                         var encodingSize = cols[1].Split(' ');
                         buildConfig.encodingSize = encodingSize;
                         break;
                     case "size":
-                        buildConfig.size = cols[1].Split(' ');
+                        buildConfig.size = cols[ 1 ].Split( ' ' );
                         break;
                     case "size-size":
-                        buildConfig.sizeSize = cols[1].Split(' ');
+                        buildConfig.sizeSize = cols[ 1 ].Split( ' ' );
                         break;
                     case "build-name":
-                        buildConfig.buildName = cols[1];
+                        buildConfig.buildName = cols[ 1 ];
                         break;
                     case "build-playbuild-installer":
-                        buildConfig.buildPlaybuildInstaller = cols[1];
+                        buildConfig.buildPlaybuildInstaller = cols[ 1 ];
                         break;
                     case "build-product":
-                        buildConfig.buildProduct = cols[1];
+                        buildConfig.buildProduct = cols[ 1 ];
                         break;
                     case "build-uid":
-                        buildConfig.buildUid = cols[1];
+                        buildConfig.buildUid = cols[ 1 ];
                         break;
                     case "patch":
-                        buildConfig.patch = cols[1];
+                        buildConfig.patch = cols[ 1 ];
                         break;
                     case "patch-size":
-                        buildConfig.patchSize = cols[1];
+                        buildConfig.patchSize = cols[ 1 ];
                         break;
                     case "patch-config":
-                        buildConfig.patchConfig = cols[1];
+                        buildConfig.patchConfig = cols[ 1 ];
                         break;
                     case "build-branch": // Overwatch
-                        buildConfig.buildBranch = cols[1];
+                        buildConfig.buildBranch = cols[ 1 ];
                         break;
                     case "build-num": // Agent
                     case "build-number": // Overwatch
                     case "build-version": // Catalog
-                        buildConfig.buildNumber = cols[1];
+                        buildConfig.buildNumber = cols[ 1 ];
                         break;
                     case "build-attributes": // Agent
-                        buildConfig.buildAttributes = cols[1];
+                        buildConfig.buildAttributes = cols[ 1 ];
                         break;
                     case "build-comments": // D3
-                        buildConfig.buildComments = cols[1];
+                        buildConfig.buildComments = cols[ 1 ];
                         break;
                     case "build-creator": // D3
-                        buildConfig.buildCreator = cols[1];
+                        buildConfig.buildCreator = cols[ 1 ];
                         break;
                     case "build-fixed-hash": // S2
-                        buildConfig.buildFixedHash = cols[1];
+                        buildConfig.buildFixedHash = cols[ 1 ];
                         break;
                     case "build-replay-hash": // S2
-                        buildConfig.buildReplayHash = cols[1];
+                        buildConfig.buildReplayHash = cols[ 1 ];
                         break;
                     case "build-t1-manifest-version":
-                        buildConfig.buildManifestVersion = cols[1];
+                        buildConfig.buildManifestVersion = cols[ 1 ];
                         break;
                     case "install-size":
-                        buildConfig.installSize = cols[1].Split(' ');
+                        buildConfig.installSize = cols[ 1 ].Split( ' ' );
                         break;
                     case "download-size":
-                        buildConfig.downloadSize = cols[1].Split(' ');
+                        buildConfig.downloadSize = cols[ 1 ].Split( ' ' );
                         break;
                     case "build-partial-priority":
                     case "partial-priority":
-                        buildConfig.partialPriority = cols[1];
+                        buildConfig.partialPriority = cols[ 1 ];
                         break;
                     case "partial-priority-size":
-                        buildConfig.partialPrioritySize = cols[1];
+                        buildConfig.partialPrioritySize = cols[ 1 ];
                         break;
                     case "build-signature-file":
-                        buildConfig.buildSignatureFile = cols[1];
+                        buildConfig.buildSignatureFile = cols[ 1 ];
                         break;
                     default:
-                        Console.WriteLine("!!!!!!!! Unknown buildconfig variable '" + cols[0] + "'");
+                        Console.WriteLine( "!!!!!!!! Unknown buildconfig variable '" + cols[ 0 ] + "'" );
                         break;
                 }
             }

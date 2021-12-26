@@ -63,6 +63,15 @@ namespace BuildBackup
             return 0;
         }
 
+        /// <summary>
+        /// 웹으로 부터 비동기 다운로드
+        /// </summary>
+        /// <param name="path">루트이하 경로</param>
+        /// <param name="returnstream"></param>
+        /// <param name="redownload"></param>
+        /// <param name="expectedSize"></param>
+        /// <param name="verbose"></param>
+        /// <returns></returns>
         public async Task<byte[]> Get( string path, bool returnstream = true, bool redownload = false, uint expectedSize = 0, bool verbose = false )
         {
             path            = path.ToLower();
